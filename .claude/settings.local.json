@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/devengoratela/Work/**)",
+      "Bash(npx create-next-app@latest dt-demo-tracker --typescript --tailwind --app --eslint --no-git --skip-git)",
+      "Bash(npx create-next-app@latest dt-demo-tracker --typescript --tailwind --app --eslint --no-git --skip-git --import-alias='@/*')",
+      "Bash(pkill -f create-next-app)",
+      "Bash(npm init:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)"
+    ]
+  }
+}
