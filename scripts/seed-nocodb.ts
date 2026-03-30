@@ -1,4 +1,21 @@
-import fetch from 'node-fetch';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+
+// Load .env.local (Next.js convention — not auto-loaded by Node.js)
+try {
+  const envPath = resolve(process.cwd(), '.env.local');
+  const lines = readFileSync(envPath, 'utf-8').split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const [key, ...rest] = trimmed.split('=');
+    if (key && rest.length) {
+      process.env[key.trim()] = rest.join('=').trim().replace(/^["']|["']$/g, '');
+    }
+  }
+} catch {
+  // .env.local not found — fall through to process.env
+}
 
 const BASE_URL = process.env.NOCODB_BASE_URL;
 const PROJECT_ID = process.env.NOCODB_PROJECT_ID;
@@ -11,7 +28,7 @@ if (!BASE_URL || !PROJECT_ID || !API_TOKEN) {
 
 const HEADERS = {
   'Content-Type': 'application/json',
-  'xc-auth': API_TOKEN,
+  'xc-token': API_TOKEN,
 };
 
 const SAMPLE_USE_CASES = [
