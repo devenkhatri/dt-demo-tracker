@@ -13,7 +13,7 @@ if (!BASE_URL || !PROJECT_ID || !API_TOKEN) {
 
 const HEADERS = {
   'Content-Type': 'application/json',
-  'xc-auth': API_TOKEN,
+  'xc-token': API_TOKEN,
 };
 
 async function nocofetch(
