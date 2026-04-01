@@ -14,42 +14,69 @@ export default function IndustryBreakdown({ stats }: IndustryBreakdownProps) {
 
   return (
     <div
-      className="rounded-lg border p-6"
-      style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+      className="rounded-xl border p-6"
+      style={{
+        background: 'var(--surface)',
+        borderColor: 'var(--border)',
+        boxShadow: 'var(--shadow-sm)',
+      }}
     >
-      <h3 className="text-sm font-semibold uppercase tracking-widest mb-6" style={{ color: 'var(--text-muted)' }}>
-        By Industry
-      </h3>
+      {/* Header */}
+      <div className="flex items-baseline justify-between mb-6">
+        <h3
+          className="text-xs font-semibold uppercase tracking-widest"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          By Industry
+        </h3>
+        <span className="text-xs tabular-nums" style={{ color: 'var(--text-muted)' }}>
+          top {industries.length}
+        </span>
+      </div>
 
       {industries.length === 0 ? (
-        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+        <p className="text-sm py-6 text-center" style={{ color: 'var(--text-muted)' }}>
           No industry data yet
         </p>
       ) : (
-        <div className="space-y-3">
-          {industries.map(([industry, count]) => (
-            <div key={industry} className="flex items-center gap-3">
-              <span
-                className="text-sm font-medium w-28 flex-shrink-0 truncate"
-                style={{ color: 'var(--text-secondary)' }}
-                title={industry}
-              >
-                {industry}
-              </span>
-              <div className="flex-1 rounded-full h-1.5" style={{ background: 'var(--border)' }}>
+        <div className="space-y-3.5">
+          {industries.map(([industry, count], idx) => {
+            const pct = Math.round((count / max) * 100);
+            // Progressively lighter opacity for ranked items
+            const opacity = Math.max(0.45, 1 - idx * 0.07);
+            return (
+              <div key={industry} className="flex items-center gap-3">
+                <span
+                  className="text-sm font-medium w-28 flex-shrink-0 truncate"
+                  style={{ color: 'var(--text-secondary)' }}
+                  title={industry}
+                >
+                  {industry}
+                </span>
+
                 <div
-                  className="h-1.5 rounded-full transition-all duration-500"
-                  style={{ width: `${(count / max) * 100}%`, background: 'var(--brand)' }}
-                />
+                  className="relative flex-1 h-2 rounded-full overflow-hidden"
+                  style={{ background: 'var(--surface-2)' }}
+                >
+                  <div
+                    className="bar-grow absolute left-0 top-0 h-full rounded-full"
+                    style={{
+                      width: `${pct}%`,
+                      background: 'var(--brand)',
+                      opacity,
+                    }}
+                  />
+                </div>
+
+                <span
+                  className="text-sm tabular-nums font-semibold w-5 text-right flex-shrink-0"
+                  style={{ color: 'var(--text-primary)' }}
+                >
+                  {count}
+                </span>
               </div>
-              <span
-                className="text-sm tabular-nums font-semibold w-4 text-right flex-shrink-0"
-                style={{ color: 'var(--text-primary)' }}
-              >
-                {count}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

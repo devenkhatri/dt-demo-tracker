@@ -17,35 +17,52 @@ export default function UseCasesPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      {/* [P2 /distill] Removed redundant subtitle "Browse and manage all AI use cases" */}
-      <div className="flex items-baseline justify-between mb-6">
-        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-          Use Cases
-        </h1>
-        <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
+
+      {/* Page header */}
+      <div className="flex items-end justify-between mb-8 animate-fade-up">
+        <div>
+          <p
+            className="text-xs font-semibold uppercase tracking-widest mb-1"
+            style={{ color: 'var(--brand)' }}
+          >
+            Library
+          </p>
+          <h1 className="text-3xl font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>
+            Use Cases
+          </h1>
+        </div>
+        <span
+          className="text-sm tabular-nums font-medium"
+          style={{ color: 'var(--text-muted)' }}
+        >
           {cases.length} {cases.length === 1 ? 'result' : 'results'}
         </span>
       </div>
 
       {error && (
         <div
-          className="mb-6 rounded-lg p-3 text-sm border"
+          role="alert"
+          className="mb-6 rounded-lg border p-3 text-sm animate-fade-up"
           style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
         >
           Error: {error}
         </div>
       )}
 
-      <UseCaseFilters
-        searchQuery={filters.searchQuery}
-        statusFilter={filters.statusFilter}
-        industryFilters={filters.industryFilters}
-        onSearchChange={updateSearchQuery}
-        onStatusChange={updateStatusFilter}
-        onIndustryChange={updateIndustryFilters}
-      />
+      <div className="animate-fade-up animate-delay-1">
+        <UseCaseFilters
+          searchQuery={filters.searchQuery}
+          statusFilter={filters.statusFilter}
+          industryFilters={filters.industryFilters}
+          onSearchChange={updateSearchQuery}
+          onStatusChange={updateStatusFilter}
+          onIndustryChange={updateIndustryFilters}
+        />
+      </div>
 
-      <UseCaseGrid cases={cases} loading={loading} />
+      <div className="animate-fade-up animate-delay-2">
+        <UseCaseGrid cases={cases} loading={loading} />
+      </div>
     </div>
   );
 }

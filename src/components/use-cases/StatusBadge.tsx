@@ -2,12 +2,9 @@ import { DemoStatus } from '@/lib/types';
 
 interface StatusBadgeProps {
   status: DemoStatus;
+  size?: 'sm' | 'md';
 }
 
-/**
- * [P2 /normalize] Uses inline-flex + w-fit so the badge hugs its label.
- * [P0 /colorize] Uses brand CSS tokens — no more blue-X/green-X hardcoding.
- */
 const statusStyles: Record<DemoStatus, React.CSSProperties> = {
   Ready: {
     background: 'var(--status-ready-bg)',
@@ -26,12 +23,28 @@ const statusStyles: Record<DemoStatus, React.CSSProperties> = {
   },
 };
 
-export default function StatusBadge({ status }: StatusBadgeProps) {
+/** Dot color per status for the leading indicator */
+const dotColor: Record<DemoStatus, string> = {
+  Ready: 'var(--status-ready)',
+  'In Progress': 'var(--status-progress)',
+  'Not Started': 'var(--status-not-started)',
+};
+
+export default function StatusBadge({ status, size = 'sm' }: StatusBadgeProps) {
+  const style = statusStyles[status] ?? statusStyles['Not Started'];
+  const px = size === 'md' ? 'px-3 py-1' : 'px-2.5 py-0.5';
+
   return (
     <span
-      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border w-fit"
-      style={statusStyles[status] ?? statusStyles['Not Started']}
+      className={`inline-flex items-center gap-1.5 ${px} rounded-full text-xs font-semibold border w-fit`}
+      style={style}
     >
+      {/* Leading dot indicator */}
+      <span
+        className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+        style={{ background: dotColor[status] ?? 'var(--text-muted)' }}
+        aria-hidden="true"
+      />
       {status}
     </span>
   );

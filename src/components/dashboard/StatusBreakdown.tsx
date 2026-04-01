@@ -6,16 +6,19 @@ interface StatusBreakdownProps {
 
 const statusConfig = {
   Ready: {
-    bar: 'var(--brand)',
-    badge: { bg: 'var(--status-ready-bg)', color: 'var(--status-ready)', border: 'var(--status-ready-border)' },
+    barFrom: 'var(--brand)',
+    barTo:   'var(--brand-muted)',
+    badge:   { bg: 'var(--status-ready-bg)', color: 'var(--status-ready)', border: 'var(--status-ready-border)' },
   },
   'In Progress': {
-    bar: 'var(--brand-muted)',
-    badge: { bg: 'var(--status-progress-bg)', color: 'var(--status-progress)', border: 'var(--status-progress-border)' },
+    barFrom: 'var(--brand-muted)',
+    barTo:   'var(--border-strong)',
+    badge:   { bg: 'var(--status-progress-bg)', color: 'var(--status-progress)', border: 'var(--status-progress-border)' },
   },
   'Not Started': {
-    bar: 'var(--border-strong)',
-    badge: { bg: 'var(--status-not-started-bg)', color: 'var(--status-not-started)', border: 'var(--status-not-started-border)' },
+    barFrom: 'var(--border-strong)',
+    barTo:   'var(--surface-3)',
+    badge:   { bg: 'var(--status-not-started-bg)', color: 'var(--status-not-started)', border: 'var(--status-not-started-border)' },
   },
 };
 
@@ -25,49 +28,97 @@ export default function StatusBreakdown({ stats }: StatusBreakdownProps) {
 
   return (
     <div
-      className="rounded-lg border p-6"
-      style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+      className="rounded-xl border p-6"
+      style={{
+        background: 'var(--surface)',
+        borderColor: 'var(--border)',
+        boxShadow: 'var(--shadow-sm)',
+      }}
     >
-      <h3 className="text-sm font-semibold uppercase tracking-widest mb-6" style={{ color: 'var(--text-muted)' }}>
-        Status Distribution
-      </h3>
+      {/* Header */}
+      <div className="flex items-baseline justify-between mb-6">
+        <h3
+          className="text-xs font-semibold uppercase tracking-widest"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          Status Distribution
+        </h3>
+        <span className="text-xs tabular-nums" style={{ color: 'var(--text-muted)' }}>
+          {total} total
+        </span>
+      </div>
 
       <div className="space-y-5">
         {(Object.entries(byStatus) as [string, number][]).map(([status, count]) => {
-          const percentage = total > 0 ? (count / total) * 100 : 0;
+          const pct = total > 0 ? Math.round((count / total) * 100) : 0;
           const cfg = statusConfig[status as keyof typeof statusConfig];
 
           return (
             <div key={status}>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                  {status}
-                </span>
-                <span
-                  className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border"
-                  style={cfg ? {
-                    background: cfg.badge.bg,
-                    color: cfg.badge.color,
-                    borderColor: cfg.badge.border,
-                  } : { background: 'var(--surface-2)', color: 'var(--text-muted)', borderColor: 'var(--border)' }}
-                >
-                  {count}
-                </span>
+                <div className="flex items-center gap-2">
+                  {/* Dot indicator */}
+                  <span
+                    className="w-2 h-2 rounded-full flex-shrink-0"
+                    style={{
+                      background: cfg?.barFrom ?? 'var(--brand)',
+                    }}
+                    aria-hidden="true"
+                  />
+                  <span
+                    className="text-sm font-medium"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    {status}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <span
+                    className="text-xs tabular-nums font-medium"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    {pct}%
+                  </span>
+                  <span
+                    className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold border tabular-nums"
+                    style={
+                      cfg
+                        ? {
+                            background: cfg.badge.bg,
+                            color: cfg.badge.color,
+                            borderColor: cfg.badge.border,
+                          }
+                        : {
+                            background: 'var(--surface-2)',
+                            color: 'var(--text-muted)',
+                            borderColor: 'var(--border)',
+                          }
+                    }
+                  >
+                    {count}
+                  </span>
+                </div>
               </div>
-              <div className="w-full rounded-full h-1.5" style={{ background: 'var(--border)' }}>
+
+              {/* Progress bar track */}
+              <div
+                className="relative w-full h-2 rounded-full overflow-hidden"
+                style={{ background: 'var(--surface-2)' }}
+              >
                 <div
-                  className="h-1.5 rounded-full transition-all duration-500"
-                  style={{ width: `${percentage}%`, background: cfg?.bar ?? 'var(--brand)' }}
+                  className="bar-grow absolute left-0 top-0 h-full rounded-full"
+                  style={{
+                    width: `${pct}%`,
+                    background: cfg
+                      ? `linear-gradient(90deg, ${cfg.barFrom}, ${cfg.barTo})`
+                      : 'var(--brand)',
+                  }}
                 />
               </div>
             </div>
           );
         })}
       </div>
-
-      <p className="text-xs mt-6" style={{ color: 'var(--text-muted)' }}>
-        {total} use cases total
-      </p>
     </div>
   );
 }

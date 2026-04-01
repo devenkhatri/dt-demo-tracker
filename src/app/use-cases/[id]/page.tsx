@@ -90,48 +90,49 @@ export default function UseCaseDetail({ params }: UseCaseDetailProps) {
   const keyBenefits = Array.isArray(useCase.KeyBenefits) ? useCase.KeyBenefits : [];
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-up">
       {/* Back link */}
       <Link
         href="/use-cases"
-        className="inline-flex items-center gap-1 text-sm font-medium mb-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded"
-        style={{ color: 'var(--text-secondary)' }}
-        onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = 'var(--brand)')}
-        onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)')}
+        className="back-link inline-flex items-center gap-1 text-sm font-medium mb-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded"
       >
         ← Use Cases
       </Link>
 
-      {/* ── Header ───────────────────────────────────────────── */}
-      {/* [P2 /arrange] Single outer container, no per-section card boxing */}
+      {/* ── Main card ─────────────────────────────────────────── */}
       <div
-        className="rounded-lg border p-8"
-        style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+        className="rounded-xl border"
+        style={{
+          background: 'var(--surface)',
+          borderColor: 'var(--border)',
+          boxShadow: 'var(--shadow-md)',
+        }}
       >
-        {/* Title row */}
-        <div className="flex items-start justify-between gap-4 mb-4">
-          <h1 className="text-2xl font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>
+        {/* Card header */}
+        <div
+          className="flex items-start justify-between gap-4 p-8 border-b"
+          style={{ borderColor: 'var(--border)' }}
+        >
+          <h1 className="text-2xl font-bold leading-snug" style={{ color: 'var(--text-primary)' }}>
             {useCase.Title}
           </h1>
           <Link
             href={`/use-cases/${useCase.Id}/edit`}
-            className="flex-shrink-0 px-3.5 py-1.5 rounded text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
-            style={{ background: 'var(--brand)', color: '#ffffff' }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.background = 'var(--brand-dark)')}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.background = 'var(--brand)')}
+            className="btn-brand flex-shrink-0 px-3.5 py-1.5 rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
           >
             Edit
           </Link>
         </div>
 
+        <div className="p-8">
+
         {/* Badge + meta */}
-        <div className="flex flex-wrap items-center gap-3 mb-5">
-          <StatusBadge status={useCase.DemoStatus} />
-          {/* [P0 FIX] formatDate now null-safe — falls back to '—' if invalid */}
-          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-            Created {formatDate(useCase.CreatedAt)} · Updated {formatDate(useCase.UpdatedAt)}
-          </span>
-        </div>
+          <div className="flex flex-wrap items-center gap-3 mb-5">
+            <StatusBadge status={useCase.DemoStatus} size="md" />
+            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+              Created {formatDate(useCase.CreatedAt)} · Updated {formatDate(useCase.UpdatedAt)}
+            </span>
+          </div>
 
         {/* Industries */}
         {Array.isArray(useCase.Industry) && useCase.Industry.length > 0 && (
@@ -237,7 +238,8 @@ export default function UseCaseDetail({ params }: UseCaseDetailProps) {
             )}
           </div>
         )}
-      </div>
+        </div>{/* /p-8 body */}
+      </div>{/* /rounded-xl card */}
 
       {/* Demo Access block sits outside the main card */}
       <div className="mt-6">

@@ -8,59 +8,85 @@ interface UseCaseCardProps {
 
 export default function UseCaseCard({ useCase }: UseCaseCardProps) {
   const excerpt =
-    useCase.ProblemStatement.substring(0, 120) +
-    (useCase.ProblemStatement.length > 120 ? '...' : '');
+    useCase.ProblemStatement.substring(0, 130) +
+    (useCase.ProblemStatement.length > 130 ? '…' : '');
 
   return (
     <Link
       href={`/use-cases/${useCase.Id}`}
-      className="block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded-lg"
+      className="block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded-xl"
     >
       <div
-        className="rounded-lg border p-5 cursor-pointer h-full flex flex-col transition-all duration-150 hover:shadow-md"
+        className="card-hover rounded-xl border h-full flex flex-col"
         style={{
           background: 'var(--surface)',
           borderColor: 'var(--border)',
+          boxShadow: 'var(--shadow-xs)',
         }}
-        onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = 'var(--brand-muted)')}
-        onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border)')}
       >
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="text-base font-semibold line-clamp-2 flex-1" style={{ color: 'var(--text-primary)' }}>
+        {/* Card header with status badge */}
+        <div
+          className="flex items-start justify-between gap-3 px-5 pt-5 pb-4 border-b"
+          style={{ borderColor: 'var(--border)' }}
+        >
+          <h3
+            className="text-sm font-semibold leading-snug line-clamp-2 flex-1"
+            style={{ color: 'var(--text-primary)' }}
+          >
             {useCase.Title}
           </h3>
+          <div className="flex-shrink-0 mt-0.5">
+            <StatusBadge status={useCase.DemoStatus} />
+          </div>
         </div>
 
-        <StatusBadge status={useCase.DemoStatus} />
-
-        <p className="text-sm mt-3 flex-1 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>
+        {/* Excerpt */}
+        <p
+          className="px-5 py-4 text-sm leading-relaxed line-clamp-3 flex-1"
+          style={{ color: 'var(--text-secondary)' }}
+        >
           {excerpt}
         </p>
 
+        {/* Industry tags */}
         {Array.isArray(useCase.Industry) && useCase.Industry.length > 0 && (
-          <div
-            className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t"
-            style={{ borderColor: 'var(--border)' }}
-          >
+          <div className="px-5 pb-4 flex flex-wrap gap-1.5">
             {useCase.Industry.slice(0, 3).map((industry) => (
               <span
                 key={industry}
-                className="text-xs px-2 py-0.5 rounded font-medium"
-                style={{ background: 'var(--surface-2)', color: 'var(--text-secondary)' }}
+                className="text-xs px-2.5 py-0.5 rounded-full font-medium border"
+                style={{
+                  background: 'var(--surface-2)',
+                  color: 'var(--text-muted)',
+                  borderColor: 'var(--border)',
+                }}
               >
                 {industry}
               </span>
             ))}
             {useCase.Industry.length > 3 && (
               <span
-                className="text-xs px-2 py-0.5 rounded font-medium"
-                style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}
+                className="text-xs px-2.5 py-0.5 rounded-full font-medium border"
+                style={{
+                  background: 'var(--surface-2)',
+                  color: 'var(--text-muted)',
+                  borderColor: 'var(--border)',
+                }}
               >
                 +{useCase.Industry.length - 3}
               </span>
             )}
           </div>
         )}
+
+        {/* Hover arrow indicator */}
+        <div
+          className="px-5 pb-4 flex items-center gap-1 text-xs font-medium"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          <span>View details</span>
+          <span aria-hidden="true">→</span>
+        </div>
       </div>
     </Link>
   );
