@@ -7,7 +7,7 @@ import IndustryBreakdown from '@/components/dashboard/IndustryBreakdown';
 import Link from 'next/link';
 
 export default function Dashboard() {
-  const { stats, loading, error } = useDashboardStats();
+  const { stats, loading, refreshing, error } = useDashboardStats();
 
   if (loading) {
     return (
@@ -39,7 +39,14 @@ export default function Dashboard() {
           className="rounded-xl border p-4 text-sm"
           style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
         >
-          Error loading dashboard: {error}
+          <p className="mb-3">Error loading dashboard: {error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="text-sm font-medium underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded"
+            style={{ color: 'var(--brand)' }}
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -72,12 +79,22 @@ export default function Dashboard() {
             Dashboard
           </h1>
         </div>
-        <Link
-          href="/use-cases"
-          className="text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded back-link"
-        >
-          View all use cases →
-        </Link>
+        <div className="flex items-center gap-3">
+          {refreshing && (
+            <span
+              className="text-xs animate-pulse"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              Refreshing...
+            </span>
+          )}
+          <Link
+            href="/use-cases"
+            className="text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded back-link"
+          >
+            View all use cases →
+          </Link>
+        </div>
       </div>
 
       {/* Metric cards */}

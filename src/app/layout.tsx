@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import Navbar from '@/components/layout/Navbar';
+import { ToastProvider } from '@/components/ui/ToastContext';
+import ToastContainer from '@/components/ui/ToastContainer';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -15,9 +17,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <a
+          href="#main-content"
+          className="skip-link sr-only"
+        >
+          Skip to main content
+        </a>
         <Navbar />
-        <main className="min-h-screen">
-          {children}
+        <main id="main-content" className="min-h-screen">
+          <ToastProvider>
+            {children}
+            <ToastContainer />
+          </ToastProvider>
         </main>
       </body>
     </html>

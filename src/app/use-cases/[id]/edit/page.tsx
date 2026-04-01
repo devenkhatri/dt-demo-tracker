@@ -77,9 +77,9 @@ export default function EditUseCasePage({ params }: EditPageProps) {
           role="alert"
           className="rounded-lg border p-4 text-sm"
           style={{
-            background: '#fef2f2',
-            borderColor: '#fecaca',
-            color: '#991b1b',
+            background: 'var(--status-error-bg)',
+            borderColor: 'var(--status-error-border)',
+            color: 'var(--status-error)',
           }}
         >
           {error || 'Use case not found'}

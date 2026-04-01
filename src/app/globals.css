@@ -45,6 +45,9 @@
   --status-not-started:   #6b7280;
   --status-not-started-bg:#f3f4f6;
   --status-not-started-border:#d1d5db;
+  --status-error:         #991b1b;
+  --status-error-bg:      #fef2f2;
+  --status-error-border:  #fecaca;
 
   /* Focus */
   --focus-ring: #215b6f;
@@ -88,6 +91,9 @@
     --status-not-started:   #9ca3af;
     --status-not-started-bg:#18242e;
     --status-not-started-border:#2b3d4d;
+    --status-error:         #f87171;
+    --status-error-bg:      #450a0a;
+    --status-error-border:  #7f1d1d;
   }
 }
 
@@ -184,3 +190,26 @@ body {
   transform: translateY(-1px);
 }
 .btn-brand:active { transform: translateY(0); }
+
+/* Skip link utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.skip-link:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0.5rem 0.75rem;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { UseCase, DemoStatus, Industry } from '@/lib/types';
 
 interface FilterState {
@@ -9,54 +9,84 @@ interface FilterState {
   industryFilters: Industry[];
 }
 
+function parseKeyBenefitsFromUseCase(useCase: UseCase): UseCase {
+  return {
+    ...useCase,
+    KeyBenefits: typeof useCase.KeyBenefits === 'string'
+      ? (() => {
+          try {
+            return JSON.parse(useCase.KeyBenefits);
+          } catch {
+            return [];
+          }
+        })()
+      : useCase.KeyBenefits,
+  };
+}
+
 export function useUseCases() {
   const [allCases, setAllCases] = useState<UseCase[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     searchQuery: '',
     statusFilter: null,
     industryFilters: [],
   });
 
-  useEffect(() => {
-    async function fetchUseCases() {
-      try {
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const fetchUseCases = useCallback(async (isAutoRefresh = false) => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+
+    try {
+      if (!isAutoRefresh) {
         setLoading(true);
-        setError(null);
-        const response = await fetch('/api/nocodb/use-cases');
+      } else {
+        setRefreshing(true);
+      }
+      setError(null);
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch use cases');
-        }
+      const response = await fetch('/api/nocodb/use-cases', {
+        signal: abortControllerRef.current.signal,
+      });
 
-        const data = await response.json();
-        const cases: UseCase[] = data.list || data;
+      if (!response.ok) {
+        throw new Error('Failed to fetch use cases');
+      }
 
-        // Parse KeyBenefits for each case
-        const parsedCases = cases.map((useCase) => ({
-          ...useCase,
-          KeyBenefits: typeof useCase.KeyBenefits === 'string'
-            ? (() => {
-                try {
-                  return JSON.parse(useCase.KeyBenefits);
-                } catch {
-                  return [];
-                }
-              })()
-            : useCase.KeyBenefits,
-        }));
+      const data = await response.json();
+      const cases: UseCase[] = data.list || data;
+      const parsedCases = cases.map(parseKeyBenefitsFromUseCase);
 
-        setAllCases(parsedCases);
-      } catch (err) {
+      setAllCases(parsedCases);
+    } catch (err) {
+      if (err instanceof Error && err.name !== 'AbortError') {
         setError(err instanceof Error ? err.message : 'Unknown error');
-      } finally {
+      }
+    } finally {
+      if (!isAutoRefresh) {
         setLoading(false);
+      } else {
+        setRefreshing(false);
       }
     }
-
-    fetchUseCases();
   }, []);
+
+  useEffect(() => {
+    fetchUseCases(false);
+    const intervalId = setInterval(() => fetchUseCases(true), 30000);
+    return () => {
+      clearInterval(intervalId);
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [fetchUseCases]);
 
   const filteredCases = useMemo(() => {
     let results = [...allCases];
@@ -92,9 +122,11 @@ export function useUseCases() {
     cases: filteredCases,
     allCases,
     loading,
+    refreshing,
     error,
     filters,
     setFilters,
+    refresh: () => fetchUseCases(false),
     updateSearchQuery: (query: string) =>
       setFilters((prev) => ({ ...prev, searchQuery: query })),
     updateStatusFilter: (status: DemoStatus | null) =>

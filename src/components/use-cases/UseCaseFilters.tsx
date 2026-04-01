@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { DemoStatus, Industry } from '@/lib/types';
 
 const INDUSTRIES: Industry[] = [
@@ -31,6 +31,7 @@ interface UseCaseFiltersProps {
  * [P2 /arrange] Inline toolbar pattern — no card chrome, no shadow, just controls.
  * [P1 /harden]  focus-visible rings on all interactive elements.
  * [P0 /colorize] brand tokens throughout.
+ * [P2 /optimize] Debounced search (300ms) to reduce re-renders during typing.
  */
 export default function UseCaseFilters({
   searchQuery,
@@ -40,6 +41,29 @@ export default function UseCaseFilters({
   onStatusChange,
   onIndustryChange,
 }: UseCaseFiltersProps) {
+  const [localSearch, setLocalSearch] = useState(searchQuery);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    setLocalSearch(searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+    debounceRef.current = setTimeout(() => {
+      if (localSearch !== searchQuery) {
+        onSearchChange(localSearch);
+      }
+    }, 300);
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, [localSearch, onSearchChange, searchQuery]);
+
   const toggleIndustry = useCallback(
     (industry: Industry) => {
       if (industryFilters.includes(industry)) {
@@ -69,8 +93,8 @@ export default function UseCaseFilters({
         <input
           id="uc-search"
           type="search"
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
+          value={localSearch}
+          onChange={(e) => setLocalSearch(e.target.value)}
           placeholder="Title, problem, or solution…"
           className="flex-1 max-w-sm px-3 py-1.5 rounded-lg text-sm border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
           style={{

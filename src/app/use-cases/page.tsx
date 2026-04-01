@@ -8,12 +8,16 @@ export default function UseCasesPage() {
   const {
     cases,
     loading,
+    refreshing,
     error,
+    refresh,
     filters,
     updateSearchQuery,
     updateStatusFilter,
     updateIndustryFilters,
   } = useUseCases();
+
+  const hasFilters = Boolean(filters.searchQuery || filters.statusFilter || filters.industryFilters.length > 0);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -31,12 +35,22 @@ export default function UseCasesPage() {
             Use Cases
           </h1>
         </div>
-        <span
-          className="text-sm tabular-nums font-medium"
-          style={{ color: 'var(--text-muted)' }}
-        >
-          {cases.length} {cases.length === 1 ? 'result' : 'results'}
-        </span>
+        <div className="flex items-center gap-3">
+          {refreshing && (
+            <span
+              className="text-xs animate-pulse"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              Refreshing...
+            </span>
+          )}
+          <span
+            className="text-sm tabular-nums font-medium"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            {cases.length} {cases.length === 1 ? 'result' : 'results'}
+          </span>
+        </div>
       </div>
 
       {error && (
@@ -45,7 +59,14 @@ export default function UseCasesPage() {
           className="mb-6 rounded-lg border p-3 text-sm animate-fade-up"
           style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
         >
-          Error: {error}
+          <p className="mb-3">Error: {error}</p>
+          <button
+            onClick={refresh}
+            className="text-sm font-medium underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded"
+            style={{ color: 'var(--brand)' }}
+          >
+            Retry
+          </button>
         </div>
       )}
 
@@ -61,7 +82,7 @@ export default function UseCasesPage() {
       </div>
 
       <div className="animate-fade-up animate-delay-2">
-        <UseCaseGrid cases={cases} loading={loading} />
+        <UseCaseGrid cases={cases} loading={loading} hasFilters={hasFilters} />
       </div>
     </div>
   );
