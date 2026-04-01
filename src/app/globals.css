@@ -1,10 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
 @import "tailwindcss";
 @source "../**/*.{js,ts,jsx,tsx,mdx}";
 
+/* ─── Brand Design Tokens ─────────────────────────────────── */
+:root {
+  /* Brand */
+  --brand:        #215b6f;
+  --brand-dark:   #194857;
+  --brand-light:  #e8f2f5;
+  --brand-muted:  #b8d4dc;
+
+  /* Surfaces */
+  --bg:           #f7f9fa;
+  --surface:      #ffffff;
+  --surface-2:    #f2f5f6;
+  --border:       #e2e8ea;
+  --border-strong:#c4d3d8;
+
+  /* Text */
+  --text-primary: #0f1f24;
+  --text-secondary:#4a6572;
+  --text-muted:   #8fa5ae;
+
+  /* Status */
+  --status-ready:         #166534;
+  --status-ready-bg:      #dcfce7;
+  --status-ready-border:  #bbf7d0;
+  --status-progress:      #215b6f;
+  --status-progress-bg:   #e8f2f5;
+  --status-progress-border:#b8d4dc;
+  --status-not-started:   #6b7280;
+  --status-not-started-bg:#f3f4f6;
+  --status-not-started-border:#d1d5db;
+
+  /* Focus */
+  --focus-ring: #215b6f;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:           #0b1317;
+    --surface:      #121d21;
+    --surface-2:    #1a2a30;
+    --border:       #233840;
+    --border-strong:#2e4a56;
+    --text-primary: #e8f2f5;
+    --text-secondary:#8fa5ae;
+    --text-muted:   #5a7a88;
+
+    --status-ready:         #4ade80;
+    --status-ready-bg:      #052e16;
+    --status-ready-border:  #14532d;
+    --status-progress:      #7ec4d4;
+    --status-progress-bg:   #0d2129;
+    --status-progress-border:#215b6f;
+    --status-not-started:   #9ca3af;
+    --status-not-started-bg:#1f2937;
+    --status-not-started-border:#374151;
+  }
+}
+
+/* ─── Base ────────────────────────────────────────────────── */
 html {
   scroll-behavior: smooth;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
-  background-color: #f9fafb;
+  background-color: var(--bg);
+  color: var(--text-primary);
+}
+
+/* ─── Focus Visible Global ───────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* ─── Utilities ──────────────────────────────────────────── */
+/** Back-navigation links in Server Component pages (no JS event handlers needed) */
+.back-link {
+  color: var(--text-secondary);
+  transition: color 150ms ease;
+}
+.back-link:hover {
+  color: var(--brand);
 }

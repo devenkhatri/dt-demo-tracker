@@ -9,6 +9,8 @@ interface EditPageProps {
   params: Promise<{ id: string }>;
 }
 
+// [P1 /colorize]  Replaced blue/gray/red Tailwind classes with brand tokens.
+// [P2 /distill]   Back link now shows the use case title instead of generic copy.
 export default function EditUseCasePage({ params }: EditPageProps) {
   const [useCase, setUseCase] = useState<UseCase | null>(null);
   const [loading, setLoading] = useState(true);
@@ -48,8 +50,8 @@ export default function EditUseCasePage({ params }: EditPageProps) {
     return (
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="animate-pulse space-y-4">
-          <div className="h-10 bg-gray-200 rounded w-1/3" />
-          <div className="h-64 bg-gray-200 rounded" />
+          <div className="h-10 rounded w-1/3" style={{ background: 'var(--border)' }} />
+          <div className="h-64 rounded" style={{ background: 'var(--border)' }} />
         </div>
       </div>
     );
@@ -58,10 +60,28 @@ export default function EditUseCasePage({ params }: EditPageProps) {
   if (error || !useCase) {
     return (
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Link href="/use-cases" className="text-blue-600 hover:text-blue-800 mb-6 inline-block">
-          ← Back to use cases
+        <Link
+          href="/use-cases"
+          className="inline-flex items-center gap-1 text-sm font-medium mb-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded"
+          style={{ color: 'var(--text-secondary)' }}
+          onMouseEnter={(e) =>
+            ((e.currentTarget as HTMLAnchorElement).style.color = 'var(--brand)')
+          }
+          onMouseLeave={(e) =>
+            ((e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)')
+          }
+        >
+          ← Use Cases
         </Link>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
+        <div
+          role="alert"
+          className="rounded-lg border p-4 text-sm"
+          style={{
+            background: '#fef2f2',
+            borderColor: '#fecaca',
+            color: '#991b1b',
+          }}
+        >
           {error || 'Use case not found'}
         </div>
       </div>
@@ -70,13 +90,30 @@ export default function EditUseCasePage({ params }: EditPageProps) {
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Link href={`/use-cases/${id}`} className="text-blue-600 hover:text-blue-800 mb-6 inline-block">
-        ← Back to use case
+      <Link
+        href={`/use-cases/${id}`}
+        className="inline-flex items-center gap-1 text-sm font-medium mb-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded"
+        style={{ color: 'var(--text-secondary)' }}
+        onMouseEnter={(e) =>
+          ((e.currentTarget as HTMLAnchorElement).style.color = 'var(--brand)')
+        }
+        onMouseLeave={(e) =>
+          ((e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)')
+        }
+      >
+        ← {useCase.Title}
       </Link>
 
-      <div className="bg-white rounded-lg shadow border border-gray-200 p-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Edit Use Case</h1>
-        <p className="text-gray-600 mb-8">{useCase.Title}</p>
+      <div
+        className="rounded-lg border p-8"
+        style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+      >
+        <h1
+          className="text-2xl font-bold mb-8"
+          style={{ color: 'var(--text-primary)' }}
+        >
+          Edit Use Case
+        </h1>
 
         <UseCaseForm initialData={useCase} isEditing={true} />
       </div>

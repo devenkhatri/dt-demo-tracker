@@ -50,8 +50,14 @@ export function truncate(text: string, length: number): string {
   return text.slice(0, length) + '...';
 }
 
-export function formatDate(date: string | Date): string {
+/**
+ * [P0 FIX] Null-safe date formatting.
+ * Falls back to '—' if the value is missing, invalid, or not parseable.
+ */
+export function formatDate(date: string | Date | null | undefined): string {
+  if (!date) return '—';
   const d = typeof date === 'string' ? new Date(date) : date;
+  if (isNaN(d.getTime())) return '—';
   return d.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',

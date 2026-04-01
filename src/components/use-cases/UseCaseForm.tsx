@@ -25,6 +25,25 @@ interface UseCaseFormProps {
   isEditing?: boolean;
 }
 
+/** Shared input classes — brand tokens, focus-visible ring, no blue-* utilities. */
+const inputClass =
+  'w-full px-3.5 py-2 rounded-lg text-sm border transition-colors ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:border-[var(--brand)]';
+
+/** Shared label styles */
+const labelStyle: React.CSSProperties = { color: 'var(--text-secondary)' };
+
+const inputStyle: React.CSSProperties = {
+  background: 'var(--surface)',
+  borderColor: 'var(--border)',
+  color: 'var(--text-primary)',
+};
+
+/**
+ * [P1 /colorize]  All blue-* / gray-* / red-* replaced with brand CSS tokens.
+ * [P1 /harden]    focus-visible rings on every interactive element; aria labels added.
+ * [P2 /normalize] Consistent label + input sizing throughout.
+ */
 export default function UseCaseForm({ initialData, isEditing }: UseCaseFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -79,7 +98,7 @@ export default function UseCaseForm({ initialData, isEditing }: UseCaseFormProps
     setBenefits((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleChange = (field: string, value: any) => {
+  const handleChange = (field: string, value: unknown) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -92,7 +111,6 @@ export default function UseCaseForm({ initialData, isEditing }: UseCaseFormProps
     setError(null);
 
     try {
-      // Validate required fields
       if (!formData.Title.trim()) {
         throw new Error('Title is required');
       }
@@ -115,8 +133,8 @@ export default function UseCaseForm({ initialData, isEditing }: UseCaseFormProps
       });
 
       if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || 'Failed to save use case');
+        const errorText = await response.text();
+        throw new Error(errorText || 'Failed to save use case');
       }
 
       const result = await response.json();
@@ -129,94 +147,150 @@ export default function UseCaseForm({ initialData, isEditing }: UseCaseFormProps
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-8" noValidate aria-label={isEditing ? 'Edit use case form' : 'Create use case form'}>
+      {/* Error banner */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
+        <div
+          role="alert"
+          className="rounded-lg border p-4 text-sm"
+          style={{
+            background: '#fef2f2',
+            borderColor: '#fecaca',
+            color: '#991b1b',
+          }}
+        >
           {error}
         </div>
       )}
 
       {/* Title */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Title *
+        <label
+          htmlFor="uc-title"
+          className="block text-sm font-medium mb-2"
+          style={labelStyle}
+        >
+          Title <span aria-hidden="true">*</span>
         </label>
         <input
+          id="uc-title"
           type="text"
           value={formData.Title}
           onChange={(e) => handleChange('Title', e.target.value)}
           placeholder="Use case title"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+          className={inputClass}
+          style={inputStyle}
           required
+          aria-required="true"
         />
       </div>
 
       {/* Industries */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-3">
+      <fieldset>
+        <legend className="block text-sm font-medium mb-3" style={labelStyle}>
           Industries
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {INDUSTRIES.map((industry) => (
-            <button
-              key={industry}
-              type="button"
-              onClick={() => toggleIndustry(industry)}
-              className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
-                formData.Industry.includes(industry)
-                  ? 'bg-blue-100 text-blue-800 border border-blue-300'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {industry}
-            </button>
-          ))}
+        </legend>
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Select industries">
+          {INDUSTRIES.map((industry) => {
+            const active = formData.Industry.includes(industry);
+            return (
+              <button
+                key={industry}
+                type="button"
+                onClick={() => toggleIndustry(industry)}
+                aria-pressed={active}
+                className="px-3 py-1.5 rounded text-sm font-medium border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
+                style={
+                  active
+                    ? {
+                        background: 'var(--brand-light)',
+                        color: 'var(--brand)',
+                        borderColor: 'var(--brand-muted)',
+                      }
+                    : {
+                        background: 'var(--surface)',
+                        color: 'var(--text-secondary)',
+                        borderColor: 'var(--border)',
+                      }
+                }
+              >
+                {industry}
+              </button>
+            );
+          })}
         </div>
-      </div>
+      </fieldset>
 
       {/* Problem Statement */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Problem Statement *
+        <label
+          htmlFor="uc-problem"
+          className="block text-sm font-medium mb-2"
+          style={labelStyle}
+        >
+          Problem Statement <span aria-hidden="true">*</span>
         </label>
         <textarea
+          id="uc-problem"
           value={formData.ProblemStatement}
           onChange={(e) => handleChange('ProblemStatement', e.target.value)}
           placeholder="Describe the problem this use case addresses"
           rows={5}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+          className={inputClass}
+          style={inputStyle}
           required
+          aria-required="true"
         />
       </div>
 
       {/* Solution Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Solution Description *
+        <label
+          htmlFor="uc-solution"
+          className="block text-sm font-medium mb-2"
+          style={labelStyle}
+        >
+          Solution Description <span aria-hidden="true">*</span>
         </label>
         <textarea
+          id="uc-solution"
           value={formData.SolutionDescription}
           onChange={(e) => handleChange('SolutionDescription', e.target.value)}
           placeholder="Describe how this solution addresses the problem"
           rows={5}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+          className={inputClass}
+          style={inputStyle}
           required
+          aria-required="true"
         />
       </div>
 
       {/* Key Benefits */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-3">
+        <p className="block text-sm font-medium mb-3" style={labelStyle}>
           Key Benefits
-        </label>
-        <div className="space-y-2 mb-3">
+        </p>
+        <div className="space-y-2 mb-3" role="list" aria-label="Added benefits">
           {benefits.map((benefit, idx) => (
-            <div key={idx} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-              <span className="text-gray-800">{benefit}</span>
+            <div
+              key={idx}
+              role="listitem"
+              className="flex items-center justify-between rounded-lg px-4 py-3"
+              style={{ background: 'var(--surface-2)', color: 'var(--text-primary)' }}
+            >
+              <span className="text-sm flex-1 mr-4">{benefit}</span>
               <button
                 type="button"
                 onClick={() => removeBenefit(idx)}
-                className="text-red-600 hover:text-red-800 font-medium"
+                aria-label={`Remove benefit: ${benefit}`}
+                className="text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded"
+                style={{ color: 'var(--text-muted)' }}
+                onMouseEnter={(e) =>
+                  ((e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)')
+                }
+                onMouseLeave={(e) =>
+                  ((e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)')
+                }
               >
                 Remove
               </button>
@@ -225,17 +299,30 @@ export default function UseCaseForm({ initialData, isEditing }: UseCaseFormProps
         </div>
         <div className="flex gap-2">
           <input
+            id="uc-new-benefit"
             type="text"
             value={newBenefit}
             onChange={(e) => setNewBenefit(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addBenefit())}
-            placeholder="Add a benefit..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            onKeyDown={(e) =>
+              e.key === 'Enter' && (e.preventDefault(), addBenefit())
+            }
+            placeholder="Add a benefit…"
+            aria-label="New benefit text"
+            className={inputClass}
+            style={{ ...inputStyle, maxWidth: 'none' }}
           />
           <button
             type="button"
             onClick={addBenefit}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            aria-label="Add benefit"
+            className="px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
+            style={{ background: 'var(--brand)', color: '#ffffff' }}
+            onMouseEnter={(e) =>
+              ((e.currentTarget as HTMLButtonElement).style.background = 'var(--brand-dark)')
+            }
+            onMouseLeave={(e) =>
+              ((e.currentTarget as HTMLButtonElement).style.background = 'var(--brand)')
+            }
           >
             Add
           </button>
@@ -243,54 +330,79 @@ export default function UseCaseForm({ initialData, isEditing }: UseCaseFormProps
       </div>
 
       {/* Demo Status */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-3">
+      <fieldset>
+        <legend className="block text-sm font-medium mb-3" style={labelStyle}>
           Demo Status
-        </label>
-        <div className="flex gap-2">
-          {DEMO_STATUSES.map((status) => (
-            <button
-              key={status}
-              type="button"
-              onClick={() => handleChange('DemoStatus', status)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                formData.DemoStatus === status
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {status}
-            </button>
-          ))}
+        </legend>
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Select demo status">
+          {DEMO_STATUSES.map((status) => {
+            const active = formData.DemoStatus === status;
+            return (
+              <button
+                key={status}
+                type="button"
+                onClick={() => handleChange('DemoStatus', status)}
+                aria-pressed={active}
+                className="px-4 py-2 rounded-lg text-sm font-semibold border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
+                style={
+                  active
+                    ? {
+                        background: 'var(--brand)',
+                        color: '#ffffff',
+                        borderColor: 'var(--brand)',
+                      }
+                    : {
+                        background: 'var(--surface)',
+                        color: 'var(--text-secondary)',
+                        borderColor: 'var(--border)',
+                      }
+                }
+              >
+                {status}
+              </button>
+            );
+          })}
         </div>
-      </div>
+      </fieldset>
 
       {/* Demo URL (only visible when Ready) */}
       {formData.DemoStatus === 'Ready' && (
         <>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="uc-demo-url"
+              className="block text-sm font-medium mb-2"
+              style={labelStyle}
+            >
               Demo URL
             </label>
             <input
+              id="uc-demo-url"
               type="url"
               value={formData.DemoUrl}
               onChange={(e) => handleChange('DemoUrl', e.target.value)}
               placeholder="https://demo.example.com"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              className={inputClass}
+              style={inputStyle}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="uc-demo-access"
+              className="block text-sm font-medium mb-2"
+              style={labelStyle}
+            >
               Demo Access Instructions
             </label>
             <textarea
+              id="uc-demo-access"
               value={formData.DemoAccessInstructions}
               onChange={(e) => handleChange('DemoAccessInstructions', e.target.value)}
               placeholder="Steps to access the demo, credentials, etc."
               rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              className={inputClass}
+              style={inputStyle}
             />
           </div>
         </>
@@ -298,31 +410,57 @@ export default function UseCaseForm({ initialData, isEditing }: UseCaseFormProps
 
       {/* Costing Notes */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label
+          htmlFor="uc-costing"
+          className="block text-sm font-medium mb-2"
+          style={labelStyle}
+        >
           Costing Notes
         </label>
         <textarea
+          id="uc-costing"
           value={formData.CostingNotes}
           onChange={(e) => handleChange('CostingNotes', e.target.value)}
           placeholder="Describe the cost structure, pricing, or relevant financial information"
           rows={4}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+          className={inputClass}
+          style={inputStyle}
         />
       </div>
 
       {/* Form Actions */}
-      <div className="flex gap-3">
+      <div className="flex gap-3 pt-2">
         <button
           type="submit"
           disabled={loading}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors font-medium"
+          aria-disabled={loading}
+          className="px-6 py-2 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
+          style={{ background: 'var(--brand)', color: '#ffffff' }}
+          onMouseEnter={(e) => {
+            if (!loading)
+              (e.currentTarget as HTMLButtonElement).style.background = 'var(--brand-dark)';
+          }}
+          onMouseLeave={(e) =>
+            ((e.currentTarget as HTMLButtonElement).style.background = 'var(--brand)')
+          }
         >
-          {loading ? 'Saving...' : isEditing ? 'Update Use Case' : 'Create Use Case'}
+          {loading ? 'Saving…' : isEditing ? 'Update Use Case' : 'Create Use Case'}
         </button>
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+          className="px-6 py-2 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
+          style={{
+            background: 'var(--surface-2)',
+            color: 'var(--text-secondary)',
+            border: '1px solid var(--border)',
+          }}
+          onMouseEnter={(e) =>
+            ((e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-strong)')
+          }
+          onMouseLeave={(e) =>
+            ((e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)')
+          }
         >
           Cancel
         </button>

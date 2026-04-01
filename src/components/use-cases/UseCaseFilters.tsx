@@ -27,6 +27,11 @@ interface UseCaseFiltersProps {
   onIndustryChange: (industries: Industry[]) => void;
 }
 
+/**
+ * [P2 /arrange] Inline toolbar pattern — no card chrome, no shadow, just controls.
+ * [P1 /harden]  focus-visible rings on all interactive elements.
+ * [P0 /colorize] brand tokens throughout.
+ */
 export default function UseCaseFilters({
   searchQuery,
   statusFilter,
@@ -55,74 +60,88 @@ export default function UseCaseFilters({
   const hasActiveFilters = searchQuery || statusFilter || industryFilters.length > 0;
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 border border-gray-200 mb-8">
+    <div className="mb-6 space-y-4" role="search" aria-label="Filter use cases">
       {/* Search */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+      <div className="flex items-center gap-3">
+        <label htmlFor="uc-search" className="text-sm font-medium flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>
           Search
         </label>
         <input
-          type="text"
+          id="uc-search"
+          type="search"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search by title, problem, or solution..."
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors"
+          placeholder="Title, problem, or solution…"
+          className="flex-1 max-w-sm px-3 py-1.5 rounded-lg text-sm border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
+          style={{
+            background: 'var(--surface)',
+            borderColor: 'var(--border)',
+            color: 'var(--text-primary)',
+          }}
         />
       </div>
 
-      {/* Status Filter */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-3">
-          Demo Status
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {STATUSES.map((status) => (
+      {/* Status + Industry filters as pill strip */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs font-medium uppercase tracking-widest flex-shrink-0" style={{ color: 'var(--text-muted)' }}>
+          Status:
+        </span>
+        {STATUSES.map((status) => {
+          const active = statusFilter === status;
+          return (
             <button
               key={status}
-              onClick={() => onStatusChange(statusFilter === status ? null : status)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                statusFilter === status
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              onClick={() => onStatusChange(active ? null : status)}
+              aria-pressed={active}
+              className="px-2.5 py-1 rounded-full text-xs font-medium border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
+              style={
+                active
+                  ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' }
+                  : { background: 'var(--surface)', color: 'var(--text-secondary)', borderColor: 'var(--border)' }
+              }
             >
               {status}
             </button>
-          ))}
-        </div>
-      </div>
+          );
+        })}
 
-      {/* Industry Filter */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-3">
-          Industries
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {INDUSTRIES.map((industry) => (
+        <span
+          className="text-xs font-medium uppercase tracking-widest flex-shrink-0 ml-3"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          Industry:
+        </span>
+        {INDUSTRIES.map((industry) => {
+          const active = industryFilters.includes(industry);
+          return (
             <button
               key={industry}
               onClick={() => toggleIndustry(industry)}
-              className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
-                industryFilters.includes(industry)
-                  ? 'bg-blue-100 text-blue-800 border border-blue-300'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              aria-pressed={active}
+              className="px-2.5 py-1 rounded-full text-xs font-medium border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
+              style={
+                active
+                  ? { background: 'var(--brand-light)', color: 'var(--brand)', borderColor: 'var(--brand-muted)' }
+                  : { background: 'var(--surface)', color: 'var(--text-secondary)', borderColor: 'var(--border)' }
+              }
             >
               {industry}
             </button>
-          ))}
-        </div>
-      </div>
+          );
+        })}
 
-      {/* Clear Filters */}
-      {hasActiveFilters && (
-        <button
-          onClick={clearFilters}
-          className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
-        >
-          Clear all filters
-        </button>
-      )}
+        {hasActiveFilters && (
+          <button
+            onClick={clearFilters}
+            className="ml-2 text-xs font-medium underline underline-offset-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded"
+            style={{ color: 'var(--text-muted)' }}
+            onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.color = 'var(--brand)')}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)')}
+          >
+            Clear all
+          </button>
+        )}
+      </div>
     </div>
   );
 }

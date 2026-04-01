@@ -4,16 +4,19 @@ interface StatusBreakdownProps {
   stats: DashboardStats;
 }
 
-const statusColors = {
-  Ready: 'bg-green-100 text-green-800',
-  'In Progress': 'bg-blue-100 text-blue-800',
-  'Not Started': 'bg-gray-100 text-gray-800',
-};
-
-const statusBars = {
-  Ready: 'bg-green-500',
-  'In Progress': 'bg-blue-500',
-  'Not Started': 'bg-gray-400',
+const statusConfig = {
+  Ready: {
+    bar: 'var(--brand)',
+    badge: { bg: 'var(--status-ready-bg)', color: 'var(--status-ready)', border: 'var(--status-ready-border)' },
+  },
+  'In Progress': {
+    bar: 'var(--brand-muted)',
+    badge: { bg: 'var(--status-progress-bg)', color: 'var(--status-progress)', border: 'var(--status-progress-border)' },
+  },
+  'Not Started': {
+    bar: 'var(--border-strong)',
+    badge: { bg: 'var(--status-not-started-bg)', color: 'var(--status-not-started)', border: 'var(--status-not-started-border)' },
+  },
 };
 
 export default function StatusBreakdown({ stats }: StatusBreakdownProps) {
@@ -21,25 +24,40 @@ export default function StatusBreakdown({ stats }: StatusBreakdownProps) {
   const total = Object.values(byStatus).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-900 mb-6">Demo Status Distribution</h3>
+    <div
+      className="rounded-lg border p-6"
+      style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+    >
+      <h3 className="text-sm font-semibold uppercase tracking-widest mb-6" style={{ color: 'var(--text-muted)' }}>
+        Status Distribution
+      </h3>
 
-      <div className="space-y-4">
-        {Object.entries(byStatus).map(([status, count]) => {
+      <div className="space-y-5">
+        {(Object.entries(byStatus) as [string, number][]).map(([status, count]) => {
           const percentage = total > 0 ? (count / total) * 100 : 0;
+          const cfg = statusConfig[status as keyof typeof statusConfig];
 
           return (
             <div key={status}>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-700">{status}</span>
-                <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${statusColors[status as keyof typeof statusColors]}`}>
+                <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                  {status}
+                </span>
+                <span
+                  className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border"
+                  style={cfg ? {
+                    background: cfg.badge.bg,
+                    color: cfg.badge.color,
+                    borderColor: cfg.badge.border,
+                  } : { background: 'var(--surface-2)', color: 'var(--text-muted)', borderColor: 'var(--border)' }}
+                >
                   {count}
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full rounded-full h-1.5" style={{ background: 'var(--border)' }}>
                 <div
-                  className={`h-2 rounded-full ${statusBars[status as keyof typeof statusBars]}`}
-                  style={{ width: `${percentage}%` }}
+                  className="h-1.5 rounded-full transition-all duration-500"
+                  style={{ width: `${percentage}%`, background: cfg?.bar ?? 'var(--brand)' }}
                 />
               </div>
             </div>
@@ -47,7 +65,9 @@ export default function StatusBreakdown({ stats }: StatusBreakdownProps) {
         })}
       </div>
 
-      <p className="text-xs text-gray-500 mt-6">Total: {total} use cases</p>
+      <p className="text-xs mt-6" style={{ color: 'var(--text-muted)' }}>
+        {total} use cases total
+      </p>
     </div>
   );
 }

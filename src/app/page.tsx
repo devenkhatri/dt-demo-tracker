@@ -1,7 +1,7 @@
 'use client';
 
 import { useDashboardStats } from '@/hooks/useDashboardStats';
-import StatCard from '@/components/dashboard/StatCard';
+import StatStrip from '@/components/dashboard/StatStrip';
 import StatusBreakdown from '@/components/dashboard/StatusBreakdown';
 import IndustryBreakdown from '@/components/dashboard/IndustryBreakdown';
 import Link from 'next/link';
@@ -11,16 +11,12 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="animate-pulse space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-gray-200 rounded-lg h-24" />
-            ))}
-          </div>
+          <div className="h-24 rounded-lg" style={{ background: 'var(--border)' }} />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-gray-200 rounded-lg h-64" />
-            <div className="bg-gray-200 rounded-lg h-64" />
+            <div className="rounded-lg h-64" style={{ background: 'var(--border)' }} />
+            <div className="rounded-lg h-64" style={{ background: 'var(--border)' }} />
           </div>
         </div>
       </div>
@@ -29,8 +25,11 @@ export default function Dashboard() {
 
   if (error) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div
+          className="rounded-lg p-4 text-sm border"
+          style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+        >
           Error loading dashboard: {error}
         </div>
       </div>
@@ -39,39 +38,21 @@ export default function Dashboard() {
 
   if (!stats) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center">
-          <p className="text-gray-500">No data available</p>
-        </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No data available</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-2">Track AI use cases and demo readiness</p>
-      </div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {/* [P2 /distill] Removed redundant subtitle — "Track AI use cases and demo readiness" */}
+      <h1 className="text-2xl font-bold mb-8" style={{ color: 'var(--text-primary)' }}>
+        Dashboard
+      </h1>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <StatCard
-          label="Total Use Cases"
-          value={stats.totalUseCases}
-          color="blue"
-        />
-        <StatCard
-          label="Ready for Demo"
-          value={stats.byStatus.Ready}
-          color="green"
-        />
-        <StatCard
-          label="In Progress"
-          value={stats.byStatus['In Progress']}
-          color="orange"
-        />
-      </div>
+      {/* [P1 /arrange] Inline stat strip — no colored icon squares */}
+      <StatStrip stats={stats} />
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -81,12 +62,20 @@ export default function Dashboard() {
 
       {/* Empty State */}
       {stats.totalUseCases === 0 && (
-        <div className="mt-12 text-center bg-white rounded-lg shadow p-12 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No use cases yet</h3>
-          <p className="text-gray-600 mb-6">Get started by creating your first use case</p>
+        <div
+          className="mt-10 text-center rounded-lg border p-12"
+          style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+        >
+          <h3 className="text-base font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+            No use cases yet
+          </h3>
+          <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
+            Get started by creating your first use case
+          </p>
           <Link
             href="/use-cases/new"
-            className="inline-block px-6 py-3 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors"
+            className="inline-block px-5 py-2 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
+            style={{ background: 'var(--brand)', color: '#ffffff' }}
           >
             Create First Use Case
           </Link>

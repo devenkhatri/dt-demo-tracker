@@ -16,14 +16,22 @@ export default function UseCasesPage() {
   } = useUseCases();
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Use Cases</h1>
-        <p className="text-gray-600 mt-2">Browse and manage all AI use cases</p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {/* [P2 /distill] Removed redundant subtitle "Browse and manage all AI use cases" */}
+      <div className="flex items-baseline justify-between mb-6">
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+          Use Cases
+        </h1>
+        <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
+          {cases.length} {cases.length === 1 ? 'result' : 'results'}
+        </span>
       </div>
 
       {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
+        <div
+          className="mb-6 rounded-lg p-3 text-sm border"
+          style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+        >
           Error: {error}
         </div>
       )}
@@ -37,12 +45,7 @@ export default function UseCasesPage() {
         onIndustryChange={updateIndustryFilters}
       />
 
-      <div>
-        <p className="text-sm text-gray-600 mb-4">
-          Showing {cases.length} {cases.length === 1 ? 'use case' : 'use cases'}
-        </p>
-        <UseCaseGrid cases={cases} loading={loading} />
-      </div>
+      <UseCaseGrid cases={cases} loading={loading} />
     </div>
   );
 }

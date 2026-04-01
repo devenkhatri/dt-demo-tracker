@@ -9,35 +9,82 @@ export default function Navbar() {
   const isActive = (path: string) => pathname === path || pathname.startsWith(path);
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <nav className="sticky top-0 z-50 border-b" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">DT</span>
+        <div className="flex justify-between h-14">
+          <div className="flex items-center gap-7">
+            {/* Logo / Wordmark */}
+            <Link
+              href="/"
+              className="flex items-center gap-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded"
+              aria-label="Demo Tracker home"
+            >
+              <div
+                className="w-7 h-7 rounded flex items-center justify-center flex-shrink-0"
+                style={{ background: 'var(--brand)' }}
+              >
+                <span className="text-white text-xs font-bold tracking-tight">DT</span>
               </div>
-              <span className="font-semibold text-gray-900 hidden sm:inline">Demo Tracker</span>
+              <span className="font-semibold text-sm hidden sm:inline" style={{ color: 'var(--text-primary)' }}>
+                Demo Tracker
+              </span>
             </Link>
 
-            <div className="hidden md:flex gap-1">
+            {/* Nav links */}
+            <div className="hidden md:flex gap-0.5">
               <Link
                 href="/"
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive('/') && pathname === '/'
-                    ? 'bg-blue-50 text-blue-700'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                aria-current={pathname === '/' ? 'page' : undefined}
+                className={`px-3 py-1.5 rounded text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] ${
+                  pathname === '/'
+                    ? 'font-semibold'
+                    : ''
                 }`}
+                style={
+                  pathname === '/'
+                    ? { background: 'var(--brand-light)', color: 'var(--brand)' }
+                    : { color: 'var(--text-secondary)' }
+                }
+                onMouseEnter={(e) => {
+                  if (pathname !== '/') {
+                    (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-primary)';
+                    (e.currentTarget as HTMLAnchorElement).style.background = 'var(--surface-2)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (pathname !== '/') {
+                    (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)';
+                    (e.currentTarget as HTMLAnchorElement).style.background = 'transparent';
+                  }
+                }}
               >
                 Dashboard
               </Link>
               <Link
                 href="/use-cases"
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                aria-current={isActive('/use-cases') ? 'page' : undefined}
+                className={`px-3 py-1.5 rounded text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] ${
                   isActive('/use-cases')
-                    ? 'bg-blue-50 text-blue-700'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'font-semibold'
+                    : ''
                 }`}
+                style={
+                  isActive('/use-cases')
+                    ? { background: 'var(--brand-light)', color: 'var(--brand)' }
+                    : { color: 'var(--text-secondary)' }
+                }
+                onMouseEnter={(e) => {
+                  if (!isActive('/use-cases')) {
+                    (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-primary)';
+                    (e.currentTarget as HTMLAnchorElement).style.background = 'var(--surface-2)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive('/use-cases')) {
+                    (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)';
+                    (e.currentTarget as HTMLAnchorElement).style.background = 'transparent';
+                  }
+                }}
               >
                 Use Cases
               </Link>
@@ -47,9 +94,12 @@ export default function Navbar() {
           <div className="flex items-center">
             <Link
               href="/use-cases/new"
-              className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
+              className="px-3.5 py-1.5 rounded text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
+              style={{ background: 'var(--brand)', color: '#ffffff' }}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.background = 'var(--brand-dark)')}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.background = 'var(--brand)')}
             >
-              New Use Case
+              + New Use Case
             </Link>
           </div>
         </div>

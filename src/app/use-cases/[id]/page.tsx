@@ -37,7 +37,6 @@ export default function UseCaseDetail({ params }: UseCaseDetailProps) {
 
         const data = await response.json();
 
-        // Parse KeyBenefits
         const parsedData = {
           ...data,
           KeyBenefits: parseKeyBenefits(data.KeyBenefits),
@@ -57,10 +56,12 @@ export default function UseCaseDetail({ params }: UseCaseDetailProps) {
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="animate-pulse space-y-4">
-          <div className="h-10 bg-gray-200 rounded w-3/4" />
-          <div className="h-40 bg-gray-200 rounded" />
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 rounded w-2/3" style={{ background: 'var(--border)' }} />
+          <div className="h-4 rounded w-1/3" style={{ background: 'var(--border)' }} />
+          <div className="h-40 rounded" style={{ background: 'var(--border)' }} />
+          <div className="h-40 rounded" style={{ background: 'var(--border)' }} />
         </div>
       </div>
     );
@@ -68,11 +69,18 @@ export default function UseCaseDetail({ params }: UseCaseDetailProps) {
 
   if (error || !useCase) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div
+          className="rounded-lg p-4 text-sm border mb-4"
+          style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+        >
           {error || 'Use case not found'}
         </div>
-        <Link href="/use-cases" className="mt-4 text-blue-600 hover:text-blue-800 inline-block">
+        <Link
+          href="/use-cases"
+          className="text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded"
+          style={{ color: 'var(--brand)' }}
+        >
           ← Back to use cases
         </Link>
       </div>
@@ -82,117 +90,159 @@ export default function UseCaseDetail({ params }: UseCaseDetailProps) {
   const keyBenefits = Array.isArray(useCase.KeyBenefits) ? useCase.KeyBenefits : [];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Link href="/use-cases" className="text-blue-600 hover:text-blue-800 mb-6 inline-block">
-        ← Back to use cases
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {/* Back link */}
+      <Link
+        href="/use-cases"
+        className="inline-flex items-center gap-1 text-sm font-medium mb-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded"
+        style={{ color: 'var(--text-secondary)' }}
+        onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = 'var(--brand)')}
+        onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)')}
+      >
+        ← Use Cases
       </Link>
 
-      <div className="bg-white rounded-lg shadow border border-gray-200 p-8 mb-8">
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">{useCase.Title}</h1>
-            <StatusBadge status={useCase.DemoStatus} />
-          </div>
+      {/* ── Header ───────────────────────────────────────────── */}
+      {/* [P2 /arrange] Single outer container, no per-section card boxing */}
+      <div
+        className="rounded-lg border p-8"
+        style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+      >
+        {/* Title row */}
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <h1 className="text-2xl font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>
+            {useCase.Title}
+          </h1>
           <Link
             href={`/use-cases/${useCase.Id}/edit`}
-            className="px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors"
+            className="flex-shrink-0 px-3.5 py-1.5 rounded text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
+            style={{ background: 'var(--brand)', color: '#ffffff' }}
+            onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.background = 'var(--brand-dark)')}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.background = 'var(--brand)')}
           >
             Edit
           </Link>
         </div>
 
-        <div className="text-sm text-gray-500 mb-6">
-          Created {formatDate(useCase.CreatedAt)} • Last updated {formatDate(useCase.UpdatedAt)}
+        {/* Badge + meta */}
+        <div className="flex flex-wrap items-center gap-3 mb-5">
+          <StatusBadge status={useCase.DemoStatus} />
+          {/* [P0 FIX] formatDate now null-safe — falls back to '—' if invalid */}
+          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+            Created {formatDate(useCase.CreatedAt)} · Updated {formatDate(useCase.UpdatedAt)}
+          </span>
         </div>
 
+        {/* Industries */}
         {Array.isArray(useCase.Industry) && useCase.Industry.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-sm font-medium text-gray-700 mb-3">Industries</h2>
-            <div className="flex flex-wrap gap-2">
-              {useCase.Industry.map((industry) => (
-                <span
-                  key={industry}
-                  className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium"
-                >
-                  {industry}
-                </span>
-              ))}
-            </div>
+          <div className="flex flex-wrap gap-1.5">
+            {useCase.Industry.map((industry) => (
+              <span
+                key={industry}
+                className="text-xs px-2.5 py-0.5 rounded-full font-medium"
+                style={{ background: 'var(--surface-2)', color: 'var(--text-secondary)' }}
+              >
+                {industry}
+              </span>
+            ))}
           </div>
         )}
-      </div>
 
-      {/* Problem Statement */}
-      <div className="bg-white rounded-lg shadow border border-gray-200 p-8 mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Problem Statement</h2>
-        <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
-          {useCase.ProblemStatement}
-        </div>
-      </div>
-
-      {/* Solution Description */}
-      <div className="bg-white rounded-lg shadow border border-gray-200 p-8 mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Solution</h2>
-        <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
-          {useCase.SolutionDescription}
-        </div>
-      </div>
-
-      {/* Key Benefits */}
-      {keyBenefits.length > 0 && (
-        <div className="bg-white rounded-lg shadow border border-gray-200 p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Key Benefits</h2>
-          <ul className="space-y-2">
-            {keyBenefits.map((benefit, idx) => (
-              <li key={idx} className="flex gap-3">
-                <span className="text-green-600 font-bold mt-1">✓</span>
-                <span className="text-gray-700">{benefit}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Costing Notes */}
-      {useCase.CostingNotes && (
-        <div className="bg-white rounded-lg shadow border border-gray-200 p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Costing</h2>
-          <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
-            {useCase.CostingNotes}
+        {/* ── Problem Statement ──────────────────────────────── */}
+        <div className="mt-8 pt-7 border-t" style={{ borderColor: 'var(--border)' }}>
+          <h2 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
+            Problem Statement
+          </h2>
+          <div className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }}>
+            {useCase.ProblemStatement}
           </div>
+        </div>
 
-          {costComponents.length > 0 && (
-            <div className="mt-6 border-t pt-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Cost Components</h3>
-              <div className="overflow-x-auto">
+        {/* ── Solution ──────────────────────────────────────── */}
+        <div className="mt-8 pt-7 border-t" style={{ borderColor: 'var(--border)' }}>
+          <h2 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
+            Solution
+          </h2>
+          <div className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }}>
+            {useCase.SolutionDescription}
+          </div>
+        </div>
+
+        {/* ── Key Benefits ──────────────────────────────────── */}
+        {keyBenefits.length > 0 && (
+          <div className="mt-8 pt-7 border-t" style={{ borderColor: 'var(--border)' }}>
+            <h2 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
+              Key Benefits
+            </h2>
+            <ul className="space-y-2">
+              {keyBenefits.map((benefit, idx) => (
+                <li key={idx} className="flex gap-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  <span className="font-bold mt-0.5 flex-shrink-0" style={{ color: 'var(--brand)' }}>✓</span>
+                  <span>{benefit}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* ── Costing ───────────────────────────────────────── */}
+        {useCase.CostingNotes && (
+          <div className="mt-8 pt-7 border-t" style={{ borderColor: 'var(--border)' }}>
+            <h2 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
+              Costing
+            </h2>
+            <div className="text-sm leading-relaxed whitespace-pre-wrap mb-4" style={{ color: 'var(--text-secondary)' }}>
+              {useCase.CostingNotes}
+            </div>
+
+            {costComponents.length > 0 && (
+              <div className="overflow-x-auto rounded-lg border" style={{ borderColor: 'var(--border)' }}>
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-2 px-3 font-semibold text-gray-700">Label</th>
-                      <th className="text-right py-2 px-3 font-semibold text-gray-700">Unit Cost</th>
-                      <th className="text-right py-2 px-3 font-semibold text-gray-700">Quantity</th>
-                      <th className="text-left py-2 px-3 font-semibold text-gray-700">Frequency</th>
+                    <tr style={{ background: 'var(--surface-2)', borderBottom: `1px solid var(--border)` }}>
+                      <th className="text-left py-2 px-4 text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+                        Label
+                      </th>
+                      <th className="text-right py-2 px-4 text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+                        Unit Cost
+                      </th>
+                      <th className="text-right py-2 px-4 text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+                        Qty
+                      </th>
+                      <th className="text-left py-2 px-4 text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+                        Frequency
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {costComponents.map((component) => (
-                      <tr key={component.Id} className="border-b border-gray-100">
-                        <td className="py-2 px-3">{component.Label}</td>
-                        <td className="text-right py-2 px-3">${component.UnitCost.toFixed(2)}</td>
-                        <td className="text-right py-2 px-3">{component.Quantity}</td>
-                        <td className="py-2 px-3">{component.Frequency}</td>
+                      <tr
+                        key={component.Id}
+                        className="border-t"
+                        style={{ borderColor: 'var(--border)' }}
+                      >
+                        <td className="py-2.5 px-4" style={{ color: 'var(--text-primary)' }}>{component.Label}</td>
+                        <td className="text-right py-2.5 px-4 tabular-nums" style={{ color: 'var(--text-secondary)' }}>
+                          ${component.UnitCost.toFixed(2)}
+                        </td>
+                        <td className="text-right py-2.5 px-4 tabular-nums" style={{ color: 'var(--text-secondary)' }}>
+                          {component.Quantity}
+                        </td>
+                        <td className="py-2.5 px-4" style={{ color: 'var(--text-secondary)' }}>{component.Frequency}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
+      </div>
 
-      {/* Demo Access */}
-      <DemoAccessBlock useCase={useCase} />
+      {/* Demo Access block sits outside the main card */}
+      <div className="mt-6">
+        <DemoAccessBlock useCase={useCase} />
+      </div>
     </div>
   );
 }
